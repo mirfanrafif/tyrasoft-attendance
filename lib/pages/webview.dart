@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trust_location/trust_location.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -24,11 +26,14 @@ class _WebViewState extends State<WebViewPage> {
     super.dispose();
     TrustLocation.stop();
   }
+
+  InAppWebViewController? webViewController;
+
   @override
   void initState() {
     super.initState();
     requestLocationPermission();
-    TrustLocation.start(5);
+    TrustLocation.start(1);
   }
 
   Future<void> getLocation() async {
@@ -46,17 +51,20 @@ class _WebViewState extends State<WebViewPage> {
   /// request location permission at runtime.
   void requestLocationPermission() async {
     var status = await Permission.location.status;
-    if (status.isGranted) {
-      getLocation();
-    }
-    if (status.isDenied) {
+    var cameraStatus = await Permission.camera.status;
+
+    if (status.isDenied || cameraStatus.isDenied) {
       Map<Permission, PermissionStatus> result =
-          await [Permission.location].request();
+          await [Permission.location, Permission.camera].request();
+      return;
     }
 
     if (await Permission.location.isPermanentlyDenied) {
       openAppSettings();
+      return;
     }
+
+    getLocation();
   }
 
   @override
@@ -70,9 +78,37 @@ class _WebViewState extends State<WebViewPage> {
 
   Widget getView() {
     if (!_isMockLocation) {
-      return WebView(
-        initialUrl: widget.url,
-        javascriptMode: JavascriptMode.unrestricted,
+      return InAppWebView(
+        initialUrlRequest:
+        URLRequest(url: Uri.parse(widget.url)),
+        onWebViewCreated: (controller) {
+          webViewController = controller;
+        },
+        androidOnPermissionRequest: (controller, origin, resources) async {
+          return PermissionRequestResponse(
+              resources: resources,
+              action: PermissionRequestResponseAction.GRANT);
+        },
+        shouldOverrideUrlLoading: (controller, navigationAction) async {
+          var uri = navigationAction.request.url!;
+
+          if (![ "http", "https", "file", "chrome",
+            "data", "javascript", "about"].contains(uri.scheme)) {
+            if (await canLaunch(widget.url)) {
+              // Launch the App
+              await launch(
+                widget.url,
+              );
+              // and cancel the request
+              return NavigationActionPolicy.CANCEL;
+            }
+          }
+
+          return NavigationActionPolicy.ALLOW;
+        },
+        onConsoleMessage: (controller, consoleMessage) {
+          print(consoleMessage);
+        },
       );
     } else {
       return const Center(
