@@ -70,8 +70,8 @@ class _WebViewState extends State<WebViewPage> {
 
   Widget getView() {
     if (!_isMockLocation) {
-      return const WebView(
-        initialUrl: "https://www.google.com",
+      return WebView(
+        initialUrl: widget.url,
         javascriptMode: JavascriptMode.unrestricted,
       );
     } else {
