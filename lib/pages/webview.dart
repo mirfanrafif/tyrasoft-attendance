@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trust_location/trust_location.dart';
+import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatefulWidget {
-  const WebViewPage({Key? key}) : super(key: key);
+  final String url;
+  const WebViewPage({Key? key, required this.url }) : super(key: key);
 
   @override
   State<WebViewPage> createState() => _WebViewState();
@@ -16,6 +18,12 @@ class _WebViewState extends State<WebViewPage> {
   String _longitude = "";
   bool _isMockLocation = false;
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    TrustLocation.stop();
+  }
   @override
   void initState() {
     super.initState();
@@ -64,6 +72,7 @@ class _WebViewState extends State<WebViewPage> {
     if (!_isMockLocation) {
       return const WebView(
         initialUrl: "https://www.google.com",
+        javascriptMode: JavascriptMode.unrestricted,
       );
     } else {
       return const Center(

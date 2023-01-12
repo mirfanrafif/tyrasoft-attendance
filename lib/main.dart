@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tyrasoft_attendance/pages/login.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tyrasoft_attendance/pages/web_select.dart';
 import 'package:tyrasoft_attendance/pages/webview.dart';
 
 void main() {
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)
       ),
-      home: const WebViewPage(),
+      home: const WebSelect(),
     );
   }
 }
