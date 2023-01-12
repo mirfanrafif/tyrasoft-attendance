@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -33,16 +35,19 @@ class _WebViewState extends State<WebViewPage> {
   void initState() {
     super.initState();
     requestLocationPermission();
-    TrustLocation.start(1);
+    TrustLocation.start(5);
   }
 
   Future<void> getLocation() async {
     try {
-      TrustLocation.onChange.listen((values) => setState(() {
-            _latitude = values.latitude ?? "";
-            _longitude = values.longitude ?? "";
-            _isMockLocation = values.isMockLocation ?? false;
-          }));
+      TrustLocation.onChange.listen((values) {
+        log("Mock location checked: " + values.isMockLocation.toString());
+        setState(() {
+          _latitude = values.latitude ?? "";
+          _longitude = values.longitude ?? "";
+          _isMockLocation = values.isMockLocation ?? false;
+        });
+      });
     } on PlatformException catch (e) {
       print('PlatformException $e');
     }
