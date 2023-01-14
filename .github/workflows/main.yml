@@ -24,13 +24,13 @@ jobs:
       - run: flutter pub get
       - run: pwd
       - run: chmod 777 ./*
-      - run: echo $UPLOAD_KEY | base64 --decode
-      - run: echo $UPLOAD_KEY | base64 --decode > android/app/upload-keystore.jks
-      - run: echo $UPLOAD_KEY | base64 --decode > android/app/upload-keystore.txt
+      - run: echo ${{ secrets.UPLOAD_KEY }} | base64 --decode
+      - run: echo ${{ secrets.UPLOAD_KEY }} | base64 --decode > android/app/upload-keystore.jks
+      - run: echo ${{ secrets.UPLOAD_KEY }} | base64 --decode > android/app/upload-keystore.txt
       - run: echo "storeFile=upload-keystore.jks" >> android/key.properties
-      - run: echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> android/key.properties
-      - run: echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> android/key.properties
-      - run: echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> android/key.properties
+      - run: echo "keyAlias=${{secrets.KEYSTORE_KEY_ALIAS}}" >> android/key.properties
+      - run: echo "storePassword=${{secrets.KEYSTORE_STORE_PASSWORD}}" >> android/key.properties
+      - run: echo "keyPassword=${{secrets.KEYSTORE_KEY_PASSWORD}}" >> android/key.properties
       - name: Check key
         uses: actions/upload-artifact@v3
         with:
