@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>860165090066-jdafsu7f0cl0b3pupae0abqn1naii38g.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.860165090066-jdafsu7f0cl0b3pupae0abqn1naii38g</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBZYReu7OJV6RN_afeK7RFVnZoXamNbMIM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>860165090066</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.tyrasoft.tyrasoftAttendance</string>
+	<key>PROJECT_ID</key>
+	<string>tyrasoft-c8a94</string>
+	<key>STORAGE_BUCKET</key>
+	<string>tyrasoft-c8a94.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:860165090066:ios:afb36b4d05a7d315bd21cb</string>
+</dict>
+</plist>
