@@ -26,6 +26,12 @@ jobs:
       - run: chmod 777 ./*
       - run: echo $UPLOAD_KEY | base64 --decode
       - run: echo $UPLOAD_KEY | base64 --decode > android/app/upload-keystore.jks
+      - run: echo $UPLOAD_KEY | base64 --decode > android/app/upload-keystore.txt
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: check-key
+          path: android/app
       - run: echo "storeFile=upload-keystore.jks" >> android/key.properties
       - run: echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> android/key.properties
       - run: echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> android/key.properties
