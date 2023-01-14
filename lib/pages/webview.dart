@@ -11,22 +11,33 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;
-  const WebViewPage({Key? key, required this.url }) : super(key: key);
+  const WebViewPage({Key? key, required this.url}) : super(key: key);
 
   @override
   State<WebViewPage> createState() => _WebViewState();
 }
 
-class _WebViewState extends State<WebViewPage> {
+class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
   String _latitude = "";
   String _longitude = "";
   bool _isMockLocation = false;
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
-    TrustLocation.stop();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      log("page resumed");
+      TrustLocation.start(1);
+    }
+    if (state == AppLifecycleState.paused) {
+      TrustLocation.stop();
+      log("page paused");
+    }
   }
 
   InAppWebViewController? webViewController;
@@ -34,14 +45,18 @@ class _WebViewState extends State<WebViewPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addObserver(this);
+    log("page initState");
     requestLocationPermission();
-    TrustLocation.start(5);
+    TrustLocation.start(1);
   }
 
   Future<void> getLocation() async {
     try {
       TrustLocation.onChange.listen((values) {
-        log("Mock location checked: " + values.isMockLocation.toString());
+        log(DateTime.now().toString() +
+            "-Mock location checked: " +
+            values.isMockLocation.toString());
         setState(() {
           _latitude = values.latitude ?? "";
           _longitude = values.longitude ?? "";
@@ -84,8 +99,7 @@ class _WebViewState extends State<WebViewPage> {
   Widget getView() {
     if (!_isMockLocation) {
       return InAppWebView(
-        initialUrlRequest:
-        URLRequest(url: Uri.parse(widget.url)),
+        initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
         onWebViewCreated: (controller) {
           webViewController = controller;
         },
@@ -97,8 +111,15 @@ class _WebViewState extends State<WebViewPage> {
         shouldOverrideUrlLoading: (controller, navigationAction) async {
           var uri = navigationAction.request.url!;
 
-          if (![ "http", "https", "file", "chrome",
-            "data", "javascript", "about"].contains(uri.scheme)) {
+          if (![
+            "http",
+            "https",
+            "file",
+            "chrome",
+            "data",
+            "javascript",
+            "about"
+          ].contains(uri.scheme)) {
             if (await canLaunch(widget.url)) {
               // Launch the App
               await launch(

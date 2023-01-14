@@ -18,8 +18,9 @@ class _WebSelectState extends State<WebSelect> {
   void initState() {
     super.initState();
     const responseUrlList = [
-       WebUrlData(id: 1, name: "Matahati", url: "https://matahati.tyrasoft.com/"),
-       WebUrlData(id: 1, name: "ERP", url: "https://erp.tyrasoft.com/")
+      WebUrlData(
+          id: 1, name: "Matahati", url: "https://matahati.tyrasoft.com/"),
+      WebUrlData(id: 1, name: "ERP", url: "https://erp.tyrasoft.com/")
     ];
     setState(() {
       urlList.addAll(responseUrlList);
@@ -59,10 +60,13 @@ class _WebSelectState extends State<WebSelect> {
                 height: 24,
               ),
               getButton("Go", () {
-                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                  builder: (context) =>
-                      WebViewPage(url: selectedUrl?.url ?? ""),
-                ), (route) => false,);
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        WebViewPage(url: selectedUrl?.url ?? ""),
+                  ),
+                  (route) => false,
+                );
               })
             ],
           ),
