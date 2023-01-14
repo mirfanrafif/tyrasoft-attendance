@@ -40,7 +40,9 @@ class _AttendancePageState extends State<AttendancePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Check In"),),
+      appBar: AppBar(
+        title: const Text("Check In"),
+      ),
       body: SafeArea(
           child: Padding(
         padding: const EdgeInsets.all(16),
@@ -85,11 +87,11 @@ class _AttendancePageState extends State<AttendancePage> {
       onTap: check,
       child: ClipOval(
           child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [
+            colors: const [
               Colors.tealAccent,
               Colors.teal,
             ],

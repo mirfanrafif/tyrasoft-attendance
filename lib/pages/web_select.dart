@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tyrasoft_attendance/bloc/url_bloc.dart';
@@ -49,7 +50,10 @@ class _WebSelectState extends State<WebSelect> {
                   const SizedBox(
                     height: 24,
                   ),
-                  getButton("Go", () {
+                  getButton("Go", () async {
+                    await FirebaseAnalytics.instance.logEvent(
+                        name: "open_web",
+                        parameters: {"url": state.selectedUrl?.url ?? ""});
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                         builder: (context) =>
