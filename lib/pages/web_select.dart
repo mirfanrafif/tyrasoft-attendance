@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tyrasoft_attendance/bloc/url_bloc.dart';
 import 'package:tyrasoft_attendance/pages/webview.dart';
 import 'package:tyrasoft_attendance/style/style.dart';
 
@@ -10,67 +12,65 @@ class WebSelect extends StatefulWidget {
 }
 
 class _WebSelectState extends State<WebSelect> {
-  List<WebUrlData> urlList = [];
-
-  WebUrlData? selectedUrl;
-
   @override
   void initState() {
     super.initState();
-    const responseUrlList = [
-      WebUrlData(
-          id: 1, name: "Matahati", url: "https://matahati.tyrasoft.com/"),
-      WebUrlData(id: 1, name: "ERP", url: "https://erp.tyrasoft.com/")
-    ];
-    setState(() {
-      urlList.addAll(responseUrlList);
-      selectedUrl = responseUrlList.first;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              DropdownButton<WebUrlData>(
-                isExpanded: true,
-                value: selectedUrl,
-                items: urlList
-                    .map(
-                      (e) => DropdownMenuItem<WebUrlData>(
-                        child: Text(e.name),
-                        value: e,
-                      ),
-                    )
-                    .toList(),
-                onChanged: (selected) {
-                  setState(() {
-                    selectedUrl = selected;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-              getButton("Go", () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        WebViewPage(url: selectedUrl?.url ?? ""),
+    return BlocBuilder<UrlBloc, UrlState>(
+      builder: (context, state) => Scaffold(
+        body: () {
+          if (state is UrlSuccess) {
+            return Container(
+              width: double.infinity,
+              height: double.infinity,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DropdownButton<WebUrlData>(
+                    isExpanded: true,
+                    value: state.selectedUrl,
+                    items: state.url
+                        .map(
+                          (e) => DropdownMenuItem<WebUrlData>(
+                            child: Text(e.name),
+                            value: e,
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (selected) {
+                      context.read<UrlBloc>().add(
+                          UpdateSelectedUrlEvent(selected ?? state.url.first));
+                    },
                   ),
-                  (route) => false,
-                );
-              })
-            ],
-          ),
-        ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  getButton("Go", () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            WebViewPage(url: state.selectedUrl?.url ?? ""),
+                      ),
+                      (route) => false,
+                    );
+                  })
+                ],
+              ),
+            );
+          } else if (state is UrlFailure) {
+            return Center(
+              child: Text(state.error),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }(),
       ),
     );
   }
