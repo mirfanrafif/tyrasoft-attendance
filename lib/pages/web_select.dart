@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +26,7 @@ class _WebSelectState extends State<WebSelect> {
       builder: (context, state) => Scaffold(
         body: () {
           if (state is UrlSuccess) {
+            log(state.selectedUrl?.url ?? "");
             return Container(
               width: double.infinity,
               height: double.infinity,

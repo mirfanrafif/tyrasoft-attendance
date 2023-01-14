@@ -6,7 +6,7 @@ abstract class UrlState extends Equatable {
   final WebUrlData? selectedUrl;
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [selectedUrl];
 }
 
 class UrlInitial extends UrlState {
@@ -28,7 +28,7 @@ class UrlSuccess extends UrlState {
                 selectedUrl ?? url.firstWhere((element) => element.id == 1));
 
   @override
-  List<Object> get props => [url];
+  List<Object?> get props => [url, selectedUrl];
 }
 
 class UrlFailure extends UrlState {
