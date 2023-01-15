@@ -19,13 +19,13 @@ void main() async {
   );
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-  await FirebaseAnalytics.instance.logAppOpen();
   PlatformDispatcher.instance.onError = (exception, stackTrace) {
     FirebaseCrashlytics.instance
         .recordError(exception, stackTrace, fatal: true);
     return true;
   };
+
+  await FirebaseAnalytics.instance.logAppOpen();
 
   runApp(const MyApp());
 }

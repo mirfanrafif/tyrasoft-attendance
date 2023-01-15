@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.AUDIO_CAPTURE" />
     <uses-feature android:name="android.hardware.camera" />
    <application
-        android:label="tyrasoft_attendance"
+        android:label="Tyrasoft Attendance"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
