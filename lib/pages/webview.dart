@@ -6,8 +6,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:trust_location/trust_location.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/platform_interface.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;
@@ -18,13 +16,11 @@ class WebViewPage extends StatefulWidget {
 }
 
 class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
-  String _latitude = "";
-  String _longitude = "";
   bool _isMockLocation = false;
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -45,7 +41,7 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     log("page initState");
     requestLocationPermission();
     TrustLocation.start(1);
@@ -58,13 +54,11 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
             "-Mock location checked: " +
             values.isMockLocation.toString());
         setState(() {
-          _latitude = values.latitude ?? "";
-          _longitude = values.longitude ?? "";
           _isMockLocation = values.isMockLocation ?? false;
         });
       });
     } on PlatformException catch (e) {
-      print('PlatformException $e');
+      log('PlatformException $e');
     }
   }
 
@@ -76,7 +70,9 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
     if (status.isDenied || cameraStatus.isDenied) {
       Map<Permission, PermissionStatus> result =
           await [Permission.location, Permission.camera].request();
-      return;
+      if (result.values.any((element) => element.isDenied)) {
+        return;
+      }
     }
 
     if (await Permission.location.isPermanentlyDenied) {
@@ -120,11 +116,9 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
             "javascript",
             "about"
           ].contains(uri.scheme)) {
-            if (await canLaunch(widget.url)) {
+            if (await canLaunchUrl(Uri.parse(widget.url))) {
               // Launch the App
-              await launch(
-                widget.url,
-              );
+              await launchUrl(Uri.parse(widget.url));
               // and cancel the request
               return NavigationActionPolicy.CANCEL;
             }
@@ -133,7 +127,7 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
           return NavigationActionPolicy.ALLOW;
         },
         onConsoleMessage: (controller, consoleMessage) {
-          print(consoleMessage);
+          log(consoleMessage.message);
         },
       );
     } else {
