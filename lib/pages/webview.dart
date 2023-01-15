@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -49,7 +50,7 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
 
   Future<void> getLocation() async {
     try {
-      TrustLocation.onChange.listen((values) {
+      TrustLocation.onChange.listen((values) async {
         log(DateTime.now().toString() +
             "-Mock location checked: " +
             values.isMockLocation.toString());

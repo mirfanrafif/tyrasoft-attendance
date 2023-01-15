@@ -87,11 +87,11 @@ class _AttendancePageState extends State<AttendancePage> {
       onTap: check,
       child: ClipOval(
           child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: const [
+            colors: [
               Colors.tealAccent,
               Colors.teal,
             ],
