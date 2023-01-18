@@ -18,6 +18,9 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
         // Update the selected url
         updateSelectedUrl(event, emit);
       }
+      else if (event is SaveSelectedUrl && state is UrlSuccess) {
+        saveSelectedUrl(event, emit);
+      }
     });
   }
 
@@ -27,14 +30,20 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
       var response = Api().getUrl();
       var selectedUrlId =
           (await SharedPreferences.getInstance()).getInt('selectedUrl');
-      var selectedUrl = response.firstWhere(
-        (element) => element.id == selectedUrlId,
-        orElse: () => response.first,
-      );
-      emit(UrlSuccess(
-        url: response,
-        selectedUrl: selectedUrl,
-      ));
+      var selectedUrl = selectedUrlId != null ? response.firstWhere(
+              (element) => element.id == selectedUrlId
+      ) : null;
+      if(selectedUrl != null && selectedUrl != -1) {
+        emit(UrlSaved(
+          url: response,
+          selectedUrl: selectedUrl,
+        ));
+      }else {
+        emit(UrlSuccess(
+          url: response,
+          selectedUrl: response.first,
+        ));
+      }
     } on ApiEexception catch (e) {
       emit(UrlFailure(e.message, null));
     } catch (e) {
@@ -44,11 +53,19 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
 
   Future<void> updateSelectedUrl(
       UpdateSelectedUrlEvent event, Emitter<UrlState> emit) async {
-    (await SharedPreferences.getInstance())
-        .setInt('selectedUrl', event.selectedUrl.id);
     emit(UrlSuccess(
       url: (state as UrlSuccess).url,
       selectedUrl: event.selectedUrl,
+    ));
+  }
+
+  Future<void> saveSelectedUrl(
+      SaveSelectedUrl event, Emitter<UrlState> emit) async {
+    (await SharedPreferences.getInstance())
+        .setInt('selectedUrl', (state as UrlSuccess).selectedUrl?.id ?? -1);
+    emit(UrlSaved(
+      url: (state as UrlSuccess).url,
+      selectedUrl: state.selectedUrl,
     ));
   }
 }

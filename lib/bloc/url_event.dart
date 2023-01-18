@@ -11,6 +11,11 @@ class GetUrlEvent extends UrlEvent {
   const GetUrlEvent();
 }
 
+class SaveSelectedUrl extends UrlEvent {
+
+  const SaveSelectedUrl();
+}
+
 class UpdateSelectedUrlEvent extends UrlEvent {
   final WebUrlData selectedUrl;
 

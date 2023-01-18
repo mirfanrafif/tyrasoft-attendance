@@ -20,12 +20,24 @@ class UrlLoading extends UrlState {
 class UrlSuccess extends UrlState {
   final List<WebUrlData> url;
 
-  UrlSuccess({
+  const UrlSuccess({
     required this.url,
     WebUrlData? selectedUrl,
   }) : super(
-            selectedUrl:
-                selectedUrl ?? url.firstWhere((element) => element.id == 1));
+            selectedUrl: selectedUrl);
+
+  @override
+  List<Object?> get props => [url, selectedUrl];
+}
+
+class UrlSaved extends UrlState {
+  final List<WebUrlData> url;
+
+  const UrlSaved({
+    required this.url,
+    WebUrlData? selectedUrl,
+  }) : super(
+      selectedUrl: selectedUrl);
 
   @override
   List<Object?> get props => [url, selectedUrl];

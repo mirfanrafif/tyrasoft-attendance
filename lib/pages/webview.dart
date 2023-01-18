@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:developer';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -18,10 +18,12 @@ class WebViewPage extends StatefulWidget {
 
 class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
   bool _isMockLocation = false;
+  Timer? timer;
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    stopCheckLocation();
     super.dispose();
   }
 
@@ -29,12 +31,24 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       log("page resumed");
-      TrustLocation.start(1);
+      startCheckMockLocation();
     }
-    if (state == AppLifecycleState.paused) {
-      TrustLocation.stop();
+    else if(state == AppLifecycleState.paused) {
       log("page paused");
+      stopCheckLocation();
     }
+  }
+
+  void stopCheckLocation() {
+    timer?.cancel();
+    TrustLocation.stop();
+  }
+  
+  void startCheckMockLocation() {
+    TrustLocation.start(2);
+    timer = Timer(const Duration(seconds: 10), () {
+      TrustLocation.stop();
+    });
   }
 
   InAppWebViewController? webViewController;
@@ -44,11 +58,7 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     log("page initState");
-    requestLocationPermission();
-    TrustLocation.start(1);
-  }
 
-  Future<void> getLocation() async {
     try {
       TrustLocation.onChange.listen((values) async {
         log(DateTime.now().toString() +
@@ -61,6 +71,9 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
     } on PlatformException catch (e) {
       log('PlatformException $e');
     }
+
+    requestLocationPermission();
+    startCheckMockLocation();
   }
 
   /// request location permission at runtime.
@@ -80,8 +93,6 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
       openAppSettings();
       return;
     }
-
-    getLocation();
   }
 
   @override
@@ -127,13 +138,10 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
 
           return NavigationActionPolicy.ALLOW;
         },
-        onConsoleMessage: (controller, consoleMessage) {
-          log(consoleMessage.message);
-        },
       );
     } else {
       return const Center(
-        child: Text("Please turn off mock location"),
+        child: Text("Please turn on location or turn off mock location"),
       );
     }
   }

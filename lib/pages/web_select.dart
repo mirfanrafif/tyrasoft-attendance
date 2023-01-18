@@ -26,7 +26,6 @@ class _WebSelectState extends State<WebSelect> {
       builder: (context, state) => Scaffold(
         body: () {
           if (state is UrlSuccess) {
-            log(state.selectedUrl?.url ?? "");
             return Container(
               width: double.infinity,
               height: double.infinity,
@@ -57,13 +56,8 @@ class _WebSelectState extends State<WebSelect> {
                     await FirebaseAnalytics.instance.logEvent(
                         name: "open_web",
                         parameters: {"url": state.selectedUrl?.url ?? ""});
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            WebViewPage(url: state.selectedUrl?.url ?? ""),
-                      ),
-                      (route) => false,
-                    );
+                    context.read<UrlBloc>().add(SaveSelectedUrl());
+                    // moveToWebView(state.selectedUrl?.url);
                   })
                 ],
               ),
@@ -79,6 +73,16 @@ class _WebSelectState extends State<WebSelect> {
           }
         }(),
       ),
+    );
+  }
+
+  void moveToWebView(String? url) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) =>
+            WebViewPage(url: url ?? ""),
+      ),
+          (route) => false,
     );
   }
 }
