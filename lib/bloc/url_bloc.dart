@@ -27,7 +27,7 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
   Future<void> getUrl(UrlEvent event, Emitter<UrlState> emit) async {
     emit(const UrlLoading(null));
     try {
-      var response = Api().getUrl();
+      var response = await Api().getUrl();
       var selectedUrlId =
           (await SharedPreferences.getInstance()).getInt('selectedUrl');
       var selectedUrl = selectedUrlId != null ? response.firstWhere(
