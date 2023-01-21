@@ -6,6 +6,7 @@ import 'package:tyrasoft_attendance/exception/api_exception.dart';
 import 'package:tyrasoft_attendance/pages/web_select.dart';
 
 part 'url_event.dart';
+
 part 'url_state.dart';
 
 class UrlBloc extends Bloc<UrlEvent, UrlState> {
@@ -18,9 +19,6 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
         // Update the selected url
         updateSelectedUrl(event, emit);
       }
-      else if (event is SaveSelectedUrl && state is UrlSuccess) {
-        saveSelectedUrl(event, emit);
-      }
     });
   }
 
@@ -30,15 +28,15 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
       var response = await Api().getUrl();
       var selectedUrlId =
           (await SharedPreferences.getInstance()).getInt('selectedUrl');
-      var selectedUrl = selectedUrlId != null ? response.firstWhere(
-              (element) => element.id == selectedUrlId
-      ) : null;
-      if(selectedUrl != null && selectedUrl != -1) {
+      var selectedUrl = selectedUrlId != null && selectedUrlId != -1
+          ? response.firstWhere((element) => element.id == selectedUrlId)
+          : null;
+      if (selectedUrl != null) {
         emit(UrlSaved(
           url: response,
           selectedUrl: selectedUrl,
         ));
-      }else {
+      } else {
         emit(UrlSuccess(
           url: response,
           selectedUrl: response.first,
@@ -53,19 +51,29 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
 
   Future<void> updateSelectedUrl(
       UpdateSelectedUrlEvent event, Emitter<UrlState> emit) async {
-    emit(UrlSuccess(
-      url: (state as UrlSuccess).url,
-      selectedUrl: event.selectedUrl,
-    ));
-  }
+    if ((state as UrlSuccess).url.any(
+          (element) =>
+              element.name.toLowerCase() == event.companyName.toLowerCase(),
+        )) {
+      var selectedUrl = (state as UrlSuccess).url.firstWhere((element) =>
+          element.name.toLowerCase() == event.companyName.toLowerCase());
 
-  Future<void> saveSelectedUrl(
-      SaveSelectedUrl event, Emitter<UrlState> emit) async {
-    (await SharedPreferences.getInstance())
-        .setInt('selectedUrl', (state as UrlSuccess).selectedUrl?.id ?? -1);
-    emit(UrlSaved(
-      url: (state as UrlSuccess).url,
-      selectedUrl: state.selectedUrl,
-    ));
+      (await SharedPreferences.getInstance())
+          .setInt('selectedUrl', (state as UrlSuccess).selectedUrl?.id ?? -1);
+
+      emit(UrlSaved(
+        url: (state as UrlSuccess).url,
+        selectedUrl: selectedUrl,
+      ));
+    } else {
+      var url = (state as UrlSuccess).url;
+      var selectedUrl = (state as UrlSuccess).selectedUrl;
+      emit(UrlNotFound(
+          state.selectedUrl, 'No url found for company ${event.companyName}'));
+      emit(UrlSuccess(
+        url: url,
+        selectedUrl: selectedUrl,
+      ));
+    }
   }
 }

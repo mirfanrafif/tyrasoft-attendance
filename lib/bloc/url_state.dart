@@ -23,8 +23,7 @@ class UrlSuccess extends UrlState {
   const UrlSuccess({
     required this.url,
     WebUrlData? selectedUrl,
-  }) : super(
-            selectedUrl: selectedUrl);
+  }) : super(selectedUrl: selectedUrl);
 
   @override
   List<Object?> get props => [url, selectedUrl];
@@ -36,11 +35,16 @@ class UrlSaved extends UrlState {
   const UrlSaved({
     required this.url,
     WebUrlData? selectedUrl,
-  }) : super(
-      selectedUrl: selectedUrl);
+  }) : super(selectedUrl: selectedUrl);
 
   @override
   List<Object?> get props => [url, selectedUrl];
+}
+
+class UrlNotFound extends UrlState {
+  final String errorMessage;
+  const UrlNotFound(WebUrlData? selectedUrl, this.errorMessage)
+      : super(selectedUrl: selectedUrl);
 }
 
 class UrlFailure extends UrlState {

@@ -11,16 +11,11 @@ class GetUrlEvent extends UrlEvent {
   const GetUrlEvent();
 }
 
-class SaveSelectedUrl extends UrlEvent {
-
-  const SaveSelectedUrl();
-}
-
 class UpdateSelectedUrlEvent extends UrlEvent {
-  final WebUrlData selectedUrl;
+  final String companyName;
 
-  const UpdateSelectedUrlEvent(this.selectedUrl);
+  const UpdateSelectedUrlEvent(this.companyName);
 
   @override
-  List<Object> get props => [selectedUrl];
+  List<Object> get props => [companyName];
 }

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +13,8 @@ class WebSelect extends StatefulWidget {
 }
 
 class _WebSelectState extends State<WebSelect> {
+  final _nameController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -22,7 +22,18 @@ class _WebSelectState extends State<WebSelect> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UrlBloc, UrlState>(
+    return BlocConsumer<UrlBloc, UrlState>(
+      listener: (context, state) {
+        if (state is UrlNotFound) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
       builder: (context, state) => Scaffold(
         body: () {
           if (state is UrlSuccess) {
@@ -33,21 +44,9 @@ class _WebSelectState extends State<WebSelect> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  DropdownButton<WebUrlData>(
-                    isExpanded: true,
-                    value: state.selectedUrl,
-                    items: state.url
-                        .map(
-                          (e) => DropdownMenuItem<WebUrlData>(
-                            child: Text(e.name),
-                            value: e,
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (selected) {
-                      context.read<UrlBloc>().add(
-                          UpdateSelectedUrlEvent(selected ?? state.url.first));
-                    },
+                  TextField(
+                    controller: _nameController,
+                    decoration: getInputDecoration("Please Enter Company Name"),
                   ),
                   const SizedBox(
                     height: 24,
@@ -56,7 +55,9 @@ class _WebSelectState extends State<WebSelect> {
                     await FirebaseAnalytics.instance.logEvent(
                         name: "open_web",
                         parameters: {"url": state.selectedUrl?.url ?? ""});
-                    context.read<UrlBloc>().add(SaveSelectedUrl());
+                    context
+                        .read<UrlBloc>()
+                        .add(UpdateSelectedUrlEvent(_nameController.text));
                     // moveToWebView(state.selectedUrl?.url);
                   })
                 ],
@@ -79,10 +80,9 @@ class _WebSelectState extends State<WebSelect> {
   void moveToWebView(String? url) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) =>
-            WebViewPage(url: url ?? ""),
+        builder: (context) => WebViewPage(url: url ?? ""),
       ),
-          (route) => false,
+      (route) => false,
     );
   }
 }
