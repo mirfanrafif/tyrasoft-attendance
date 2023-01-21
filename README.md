@@ -13,5 +13,6 @@ Aplikasi Mobile untuk Mengakses ERP Tyrasoft dan Absensi
       2. Cek Mock Location
       
 ### V2
-1. Url Select Dropdown (one time select)
+1. Text input for search company by name
 2. WebView
+
