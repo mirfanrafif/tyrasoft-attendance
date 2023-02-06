@@ -7,7 +7,7 @@ import 'package:tyrasoft_attendance/pages/web_select.dart';
 import 'package:http/http.dart';
 
 class Api {
-  final String baseUrl = "5afb-2001-448a-50a0-4d9a-7624-951b-fb9-7415.ap.ngrok.io";
+  final String baseUrl = "erp.tyrasoft.com";
 
   Future<List<WebUrlData>> getUrl() async {
     try {
