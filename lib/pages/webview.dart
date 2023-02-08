@@ -20,6 +20,8 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
   bool _isMockLocation = false;
   Timer? timer;
 
+  double progress = 0;
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -103,35 +105,50 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
 
   Widget getView() {
     if (!_isMockLocation) {
-      return InAppWebView(
-        initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
-        androidOnPermissionRequest: (controller, origin, resources) async {
-          return PermissionRequestResponse(
-              resources: resources,
-              action: PermissionRequestResponseAction.GRANT);
-        },
-        shouldOverrideUrlLoading: (controller, navigationAction) async {
-          var uri = navigationAction.request.url!;
+      return Stack(
+        children: [
+          InAppWebView(
+            onProgressChanged: (controller, progress) {
+              setState(() {
+                this.progress = progress / 100;
+              });
+            },
+            initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
+            androidOnPermissionRequest: (controller, origin, resources) async {
+              return PermissionRequestResponse(
+                  resources: resources,
+                  action: PermissionRequestResponseAction.GRANT);
+            },
+            shouldOverrideUrlLoading: (controller, navigationAction) async {
+              var uri = navigationAction.request.url!;
 
-          if (![
-            "http",
-            "https",
-            "file",
-            "chrome",
-            "data",
-            "javascript",
-            "about"
-          ].contains(uri.scheme)) {
-            if (await canLaunchUrl(Uri.parse(widget.url))) {
-              // Launch the App
-              await launchUrl(Uri.parse(widget.url));
-              // and cancel the request
-              return NavigationActionPolicy.CANCEL;
-            }
-          }
+              if (![
+                "http",
+                "https",
+                "file",
+                "chrome",
+                "data",
+                "javascript",
+                "about"
+              ].contains(uri.scheme)) {
+                if (await canLaunchUrl(Uri.parse(widget.url))) {
+                  // Launch the App
+                  await launchUrl(Uri.parse(widget.url));
+                  // and cancel the request
+                  return NavigationActionPolicy.CANCEL;
+                }
+              }
 
-          return NavigationActionPolicy.ALLOW;
-        },
+              return NavigationActionPolicy.ALLOW;
+            },
+          ),
+          progress < 1.0
+              ? LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.transparent,
+                )
+              : Container(),
+        ],
       );
     } else {
       return const Center(
