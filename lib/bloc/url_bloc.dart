@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tyrasoft_attendance/datasource/api.dart';
 import 'package:tyrasoft_attendance/exception/api_exception.dart';
@@ -42,9 +44,11 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
           selectedUrl: response.first,
         ));
       }
-    } on ApiEexception catch (e) {
+    } on ApiEexception catch (e, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
       emit(UrlFailure(e.message, null));
-    } catch (e) {
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
       emit(UrlFailure(e.toString(), null));
     }
   }
