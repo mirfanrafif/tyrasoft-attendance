@@ -32,8 +32,7 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       log("page resumed");
       startCheckMockLocation();
-    }
-    else if(state == AppLifecycleState.paused) {
+    } else if (state == AppLifecycleState.paused) {
       log("page paused");
       stopCheckLocation();
     }
@@ -43,15 +42,13 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
     timer?.cancel();
     TrustLocation.stop();
   }
-  
+
   void startCheckMockLocation() {
     TrustLocation.start(2);
     timer = Timer(const Duration(seconds: 10), () {
       TrustLocation.stop();
     });
   }
-
-  InAppWebViewController? webViewController;
 
   @override
   void initState() {
@@ -108,9 +105,6 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
     if (!_isMockLocation) {
       return InAppWebView(
         initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
-        onWebViewCreated: (controller) {
-          webViewController = controller;
-        },
         androidOnPermissionRequest: (controller, origin, resources) async {
           return PermissionRequestResponse(
               resources: resources,

@@ -22,7 +22,7 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
     });
   }
 
-  Future<void> getUrl(UrlEvent event, Emitter<UrlState> emit) async {
+  Future<void> getUrl(GetUrlEvent event, Emitter<UrlState> emit) async {
     emit(const UrlLoading(null));
     try {
       var response = await Api().getUrl();

@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tyrasoft_attendance/pages/web_select.dart';
 import 'package:tyrasoft_attendance/pages/webview.dart';
@@ -52,9 +51,9 @@ class MyApp extends StatelessWidget {
         ),
         home: BlocBuilder<UrlBloc, UrlState>(
           builder: (context, state) {
-            if(state is UrlSaved && state.selectedUrl != null) {
+            if (state is UrlSaved && state.selectedUrl != null) {
               return WebViewPage(url: state.selectedUrl?.url ?? "");
-            }else {
+            } else {
               return const WebSelect();
             }
           },

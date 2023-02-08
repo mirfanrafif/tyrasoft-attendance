@@ -65,7 +65,45 @@ class _WebSelectState extends State<WebSelect> {
             );
           } else if (state is UrlFailure) {
             return Center(
-              child: Text(state.error),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Error while retrieving page data",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Text(
+                          state.error,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        getButton("Retry", () {
+                          context.read<UrlBloc>().add(const GetUrlEvent());
+                        })
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             );
           } else {
             return const Center(
