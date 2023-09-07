@@ -1,15 +1,18 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tyrasoft_attendance/datasource/api.dart';
 import 'package:tyrasoft_attendance/exception/api_exception.dart';
 import 'package:tyrasoft_attendance/pages/web_select.dart';
-
+import 'package:collection/collection.dart';
 part 'url_event.dart';
 
 part 'url_state.dart';
+
+const SELECTED_URL = 'selectedUrl';
 
 class UrlBloc extends Bloc<UrlEvent, UrlState> {
   UrlBloc() : super(const UrlInitial(null)) {
@@ -17,67 +20,61 @@ class UrlBloc extends Bloc<UrlEvent, UrlState> {
       if (event is GetUrlEvent) {
         // Get the url
         await getUrl(event, emit);
-      } else if (event is UpdateSelectedUrlEvent && state is UrlSuccess) {
+      } else if (event is UpdateSelectedUrlEvent) {
         // Update the selected url
-        updateSelectedUrl(event, emit);
+        await updateSelectedUrl(event, emit);
       }
     });
   }
 
   Future<void> getUrl(GetUrlEvent event, Emitter<UrlState> emit) async {
-    emit(const UrlLoading(null));
-    try {
-      var response = await Api().getUrl();
-      var selectedUrlId =
-          (await SharedPreferences.getInstance()).getInt('selectedUrl');
-      var selectedUrl = selectedUrlId != null && selectedUrlId != -1
-          ? response.firstWhere((element) => element.id == selectedUrlId)
-          : null;
-      if (selectedUrl != null) {
-        emit(UrlSaved(
-          url: response,
-          selectedUrl: selectedUrl,
-        ));
-      } else {
-        emit(UrlSuccess(
-          url: response,
-          selectedUrl: response.first,
-        ));
-      }
-    } on ApiEexception catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
-      emit(UrlFailure(e.message, null));
-    } catch (e, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
-      emit(UrlFailure(e.toString(), null));
+    var savedUrl =
+        (await SharedPreferences.getInstance()).getString(SELECTED_URL);
+
+    if (savedUrl != null) {
+      emit(UrlSaved(
+        url: const [],
+        selectedUrl: savedUrl,
+      ));
     }
   }
 
   Future<void> updateSelectedUrl(
       UpdateSelectedUrlEvent event, Emitter<UrlState> emit) async {
-    if ((state as UrlSuccess).url.any(
-          (element) =>
-              element.name.toLowerCase() == event.companyName.toLowerCase(),
-        )) {
-      var selectedUrl = (state as UrlSuccess).url.firstWhere((element) =>
-          element.name.toLowerCase() == event.companyName.toLowerCase());
+    emit(const UrlLoading(null));
 
-      (await SharedPreferences.getInstance())
-          .setInt('selectedUrl', (state as UrlSuccess).selectedUrl?.id ?? -1);
+    var sharedPref = await SharedPreferences.getInstance();
 
-      emit(UrlSaved(
-        url: (state as UrlSuccess).url,
-        selectedUrl: selectedUrl,
-      ));
-    } else {
-      var url = (state as UrlSuccess).url;
-      var selectedUrl = (state as UrlSuccess).selectedUrl;
+    try {
+      var response = await Api(baseUrl: event.url).getUrl();
+
+      var selectedUrl = response
+          .firstWhereOrNull((element) => element.name == event.companyName);
+
+      if (selectedUrl == null) {
+        emit(UrlNotFound(state.selectedUrl,
+            'No url found for company ${event.companyName}'));
+        emit(const UrlInitial(null));
+      } else {
+        //save to shared preferences
+        sharedPref.setString(SELECTED_URL, selectedUrl.url);
+
+        emit(UrlSaved(
+          url: response,
+          selectedUrl: selectedUrl.url,
+        ));
+      }
+    } on ApiEexception catch (e, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
       emit(UrlNotFound(
           state.selectedUrl, 'No url found for company ${event.companyName}'));
-      emit(UrlSuccess(
-        url: url,
-        selectedUrl: selectedUrl,
-      ));
+      emit(const UrlInitial(null));
+    } catch (e, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+
+      emit(UrlNotFound(
+          state.selectedUrl, 'No url found for company ${event.companyName}'));
+      emit(const UrlInitial(null));
     }
   }
 }

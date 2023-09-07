@@ -21,51 +21,7 @@ class _WebSelectState extends State<WebSelect> {
     super.initState();
   }
 
-  Widget getFailedUI(UrlFailure state) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  "Error while retrieving page data",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Text(
-                  state.error,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                getButton("Retry", () {
-                  context.read<UrlBloc>().add(const GetUrlEvent());
-                })
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget getForm(UrlSuccess state) {
+  Widget getForm(UrlInitial state) {
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -89,11 +45,9 @@ class _WebSelectState extends State<WebSelect> {
           ),
           getButton("Go", () async {
             await FirebaseAnalytics.instance.logEvent(
-                name: "open_web",
-                parameters: {"url": state.selectedUrl?.url ?? ""});
-            context
-                .read<UrlBloc>()
-                .add(UpdateSelectedUrlEvent(_nameController.text));
+                name: "open_web", parameters: {"url": _nameController.text});
+            context.read<UrlBloc>().add(UpdateSelectedUrlEvent(
+                _nameController.text, _urlController.text));
             // moveToWebView(state.selectedUrl?.url);
           })
         ],
@@ -117,10 +71,8 @@ class _WebSelectState extends State<WebSelect> {
       },
       builder: (context, state) => Scaffold(
         body: () {
-          if (state is UrlSuccess) {
+          if (state is UrlInitial) {
             return getForm(state);
-          } else if (state is UrlFailure) {
-            return getFailedUI(state);
           } else {
             return const Center(
               child: CircularProgressIndicator(),

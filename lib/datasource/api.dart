@@ -7,7 +7,7 @@ import 'package:tyrasoft_attendance/pages/web_select.dart';
 import 'package:http/http.dart';
 
 class Api {
-  final String baseUrl = "erp.tyrasoft.com";
+  final String baseUrl;
 
   Future<List<WebUrlData>> getUrl() async {
     try {
@@ -29,4 +29,6 @@ class Api {
       throw ApiEexception(e.toString());
     }
   }
+
+  const Api({this.baseUrl = "erp.tyrasoft.com"});
 }

@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<UrlBloc, UrlState>(
           builder: (context, state) {
             if (state is UrlSaved && state.selectedUrl != null) {
-              return WebViewPage(url: state.selectedUrl?.url ?? "");
+              return WebViewPage(url: state.selectedUrl ?? "");
             } else {
               return const WebSelect();
             }

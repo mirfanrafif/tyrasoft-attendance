@@ -13,8 +13,9 @@ class GetUrlEvent extends UrlEvent {
 
 class UpdateSelectedUrlEvent extends UrlEvent {
   final String companyName;
+  final String url;
 
-  const UpdateSelectedUrlEvent(this.companyName);
+  const UpdateSelectedUrlEvent(this.companyName, this.url);
 
   @override
   List<Object> get props => [companyName];
