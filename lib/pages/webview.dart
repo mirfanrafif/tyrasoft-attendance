@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;
+
   const WebViewPage({Key? key, required this.url}) : super(key: key);
 
   @override
@@ -133,7 +134,15 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
               ].contains(uri.scheme)) {
                 if (await canLaunchUrl(Uri.parse(widget.url))) {
                   // Launch the App
-                  await launchUrl(Uri.parse(widget.url));
+                  await launchUrl(
+                    Uri.parse(widget.url),
+                    webViewConfiguration: const WebViewConfiguration(
+                      headers: {
+                        'X-My-App': 'FlutterApp',
+                        'User-Agent': 'Flutter App'
+                      },
+                    ),
+                  );
                   // and cancel the request
                   return NavigationActionPolicy.CANCEL;
                 }

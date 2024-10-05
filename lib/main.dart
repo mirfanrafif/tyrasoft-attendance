@@ -6,7 +6,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tyrasoft_attendance/pages/web_select.dart';
 import 'package:tyrasoft_attendance/pages/webview.dart';
 
 import 'bloc/url_bloc.dart';
@@ -39,7 +38,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => UrlBloc()..add(const GetUrlEvent()),
+          create: (context) => UrlBloc()
+            ..add(
+              const GetUrlEvent(),
+            ),
         ),
       ],
       child: MaterialApp(
@@ -49,15 +51,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.teal,
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         ),
-        home: BlocBuilder<UrlBloc, UrlState>(
-          builder: (context, state) {
-            if (state is UrlSaved && state.selectedUrl != null) {
-              return WebViewPage(url: state.selectedUrl ?? "");
-            } else {
-              return const WebSelect();
-            }
-          },
-        ),
+        home:
+            const WebViewPage(url: "https://8916-66-96-225-90.ngrok-free.app/"),
       ),
     );
   }
