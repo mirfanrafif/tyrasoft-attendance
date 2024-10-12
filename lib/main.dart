@@ -6,10 +6,12 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tyrasoft_attendance/bloc/login/login_bloc.dart';
 import 'package:tyrasoft_attendance/pages/webview.dart';
 
 import 'bloc/url_bloc.dart';
 import 'firebase_options.dart';
+import 'pages/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +45,9 @@ class MyApp extends StatelessWidget {
               const GetUrlEvent(),
             ),
         ),
+        BlocProvider(
+          create: (context) => LoginBloc(),
+        ),
       ],
       child: MaterialApp(
         title: 'Tyrasoft Attendance',
@@ -50,9 +55,22 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.teal,
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+              ),
+            ),
+          ),
+          inputDecorationTheme: const InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(8),
+              ),
+            ),
+          ),
         ),
-        home:
-            const WebViewPage(url: "https://8916-66-96-225-90.ngrok-free.app/"),
+        home: const LoginPage(),
       ),
     );
   }

@@ -10,8 +10,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;
+  final String? sessionId;
 
-  const WebViewPage({Key? key, required this.url}) : super(key: key);
+  const WebViewPage({
+    Key? key,
+    required this.url,
+    this.sessionId,
+  }) : super(key: key);
 
   @override
   State<WebViewPage> createState() => _WebViewState();
@@ -136,8 +141,10 @@ class _WebViewState extends State<WebViewPage> with WidgetsBindingObserver {
                   // Launch the App
                   await launchUrl(
                     Uri.parse(widget.url),
-                    webViewConfiguration: const WebViewConfiguration(
+                    webViewConfiguration: WebViewConfiguration(
                       headers: {
+                        'Cookie':
+                            'frontend_lang=en_US; visitor_uuid=9b3a300883814e3a91405a1dd7994741; tz=Asia/Jakarta; session_id=${widget.sessionId}; cids=1',
                         'X-My-App': 'FlutterApp',
                         'User-Agent': 'Flutter App'
                       },
